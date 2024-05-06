@@ -149,8 +149,10 @@ int main(int argc, char* argv[])
             hMBAAHandle = GetProcessByName(L"MBAA.exe");
 
             // don't do anything until we re-attach to mbaa
-            if (hMBAAHandle == 0x0)
+            if (hMBAAHandle == 0x0) {
+                Sleep(100);
                 continue;
+            }
 
             SetConsoleCursorPosition(hConsoleHandle, { 0, 7 });
             std::cout << "                                              ";
