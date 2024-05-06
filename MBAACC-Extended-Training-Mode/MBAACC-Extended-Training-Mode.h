@@ -1,12 +1,12 @@
 #pragma once
-#include <Windows.h>
-#include "tlhelp32.h"
+#include <windows.h>
+#include <tlhelp32.h>
 #include <stdio.h>
 #include <string.h>
 #include <psapi.h>
 #include <iostream>
 #include <chrono>
-#include "json.hpp"
+#include <json.hpp>
 
 #include "Constants.h"
 #include "CharacterData.h"
@@ -37,9 +37,9 @@ std::string GetLatestVersion()
         sVersion = json["name"];
     }
     catch(...)
-    { 
+    {
     }
-    
+
     return sVersion;
 }
 
@@ -124,7 +124,7 @@ void SetGuard(HANDLE hMBAAHandle, DWORD dwBaseAddress, int nLevel, int nP1Moon, 
 {
     int nWriteBuffer = vGuardLevelLookupTable[nP1Moon * 5 + nLevel];
     WriteProcessMemory(hMBAAHandle, (LPVOID)(dwBaseAddress + dwP1GuardAmount), &nWriteBuffer, 4, 0);
-    
+
     nWriteBuffer = vGuardLevelLookupTable[nP2Moon * 5 + nLevel];
     WriteProcessMemory(hMBAAHandle, (LPVOID)(dwBaseAddress + dwP1GuardAmount + dwP2Offset), &nWriteBuffer, 4, 0);
 }

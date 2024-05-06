@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <Windows.h>
+#include <windows.h>
 #include <map>
 
 enum eMenu { MAIN = 2, BATTLE_SETTINGS = 6, ENEMY_SETTINGS = 7, VIEW_SCREEN = 12 };
