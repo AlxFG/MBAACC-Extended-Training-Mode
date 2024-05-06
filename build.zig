@@ -22,6 +22,7 @@ pub fn build(b: *std.Build) void {
         .files = cxxsource,
         .flags = cxxflags,
     });
+    exe.root_module.addIncludePath(b.path("MBAACC-Extended-Training-Mode/lib"));
 
     const curl = b.option(bool, "curl", "use curl for autoupdating and checking version information (default: true)") orelse true;
     if (curl == true) exe.root_module.addCMacro("USE_CURL", "");
