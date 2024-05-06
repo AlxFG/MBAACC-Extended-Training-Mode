@@ -2,6 +2,13 @@
 #include "Constants.h"
 #include "RawData.h"
 
+#ifndef max
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+#ifndef min
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+
 // Character ID is created as a concatination of char number and moon.  Ex. Sats is 29 and C is 0, so CSats is 290
 enum eCharacterValues
 {

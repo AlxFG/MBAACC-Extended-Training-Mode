@@ -1,9 +1,9 @@
 #pragma once
 #include <windows.h>
 #include <tlhelp32.h>
+#include <psapi.h>
 #include <stdio.h>
 #include <string.h>
-#include <psapi.h>
 #include <iostream>
 #include <chrono>
 #include <json.hpp>
@@ -11,6 +11,13 @@
 #include "Constants.h"
 #include "CharacterData.h"
 #include "PointerManager.h"
+
+#ifndef max
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+#ifndef min
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif
 
 std::string exec(const char* cmd) {
     std::array<char, 128> buffer;
