@@ -106,9 +106,11 @@ int main(int argc, char* argv[])
 
     std::srand((unsigned int)std::time(nullptr));
 
+#ifdef USE_CURL
     sOnlineVersion = GetLatestVersion();
     if (sOnlineVersion != "" && sOnlineVersion != VERSION)
         bNeedToAnnounceNewVersion = true;
+#endif
 
     hConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursorInfo;
