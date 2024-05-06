@@ -59,8 +59,8 @@ DWORD GetBaseAddressByName(HANDLE pHandle, const wchar_t* name)
     {
         for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
         {
-            TCHAR szModName[MAX_PATH];
-            if (GetModuleFileNameEx(pHandle, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR)))
+            wchar_t szModName[MAX_PATH];
+            if (GetModuleFileNameExW(pHandle, hMods[i], szModName, sizeof(szModName) / sizeof(wchar_t)))
             {
                 std::wstring wstrModName = szModName;
                 std::wstring wstrModContain = L"MBAA.exe";
@@ -81,12 +81,12 @@ HANDLE GetProcessByName(const wchar_t* name)
 
     // Create toolhelp snapshot.
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    PROCESSENTRY32 process;
+    PROCESSENTRY32W process;
     ZeroMemory(&process, sizeof(process));
     process.dwSize = sizeof(process);
 
     // Walkthrough all processes.
-    if (Process32First(snapshot, &process))
+    if (Process32FirstW(snapshot, &process))
     {
         do
         {
@@ -97,7 +97,7 @@ HANDLE GetProcessByName(const wchar_t* name)
                 pid = process.th32ProcessID;
                 break;
             }
-        } while (Process32Next(snapshot, &process));
+        } while (Process32NextW(snapshot, &process));
     }
 
     CloseHandle(snapshot);
