@@ -207,6 +207,7 @@ int main(int argc, char* argv[])
             SetConsoleTextAttribute(hConsoleHandle, 15);
             std::cout << "===========================================================================" << "\n";
             std::cout << "|   Fang, gonp, NaN, and meepster99(Inana) present                        |" << "\n";
+            std::cout << "|   fuck|" << "\n";
             std::cout << "|   ";
             SetConsoleTextAttribute(hConsoleHandle, nCurrentTime % 14 + 1);
             std::cout << "Extended Training Mode Mod " << VERSION;

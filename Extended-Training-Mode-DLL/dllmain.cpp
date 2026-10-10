@@ -222,6 +222,106 @@ void __stdcall asmPatchMemcpy(void* dest, void* source, DWORD n)
 #include "DirectXHook.h"
 //#include "RendererModifications.h"
 
+typedef LPDIRECT3D9 (WINAPI *D3D9CreateFn)(UINT);
+typedef IDirect3DDevice9 *(__stdcall *CreateDeviceFn) (LPDIRECT3D9, UINT, D3DDEVTYPE, HWND, DWORD, D3DPRESENT_PARAMETERS*, IDirect3DDevice9** );
+
+typedef struct {
+    HWND window;
+    WNDCLASSEX wclass;
+} Window_Context;
+
+Window_Context create_window(void) {
+    WNDCLASSEX winclass = {0};
+    winclass.cbSize = sizeof(WNDCLASSEX);
+    winclass.style = CS_HREDRAW | CS_VREDRAW;
+    winclass.lpfnWndProc = DefWindowProc;
+    winclass.hInstance = GetModuleHandle(NULL);
+    winclass.lpszClassName = L"dummy";
+
+    Window_Context context = {0};
+    context.wclass = winclass;
+
+    RegisterClassEx(&context.wclass);
+    context.window = CreateWindow(
+        context.wclass.lpszClassName,
+        L"dummy window",
+        WS_OVERLAPPEDWINDOW,
+        0,
+        0,
+        100,
+        100,
+        NULL,
+        NULL,
+        context.wclass.hInstance,
+        NULL
+    );
+    return context;
+}
+
+bool d3device_vtable(void) {
+    bool ret = false;
+    Window_Context window_context;
+    HMODULE d3d9_module;
+    D3D9CreateFn d3d9_create;
+    IDirect3D9 *d3d9;
+    D3DPRESENT_PARAMETERS d3d9_params;
+    d3d9_params.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3d9_params.hDeviceWindow = window_context.window;
+    d3d9_params.Windowed = 1;
+    IDirect3DDevice9 *d3device;
+    HRESULT res;
+
+    // create dummy window
+    window_context = create_window();
+    if (window_context.window == NULL) {
+        goto CLEANUP_CONTEXT;
+    }
+
+    // load d3d9.dll
+    d3d9_module = GetModuleHandle(L"d3d9.dll");
+    if (d3d9_module == NULL) {
+        goto CLEANUP_WINDOW;
+    }
+
+    // direct3d object create
+    d3d9_create = reinterpret_cast<D3D9CreateFn>(GetProcAddress(d3d9_module, "Direct3DCreate9"));
+    if (d3d9_create == NULL) {
+        goto CLEANUP_WINDOW;
+    }
+
+    d3d9 = d3d9_create(D3D_SDK_VERSION);
+    if (d3d9 == NULL) {
+        goto CLEANUP_WINDOW;
+    }
+
+    // create direct3d d3device
+    res = IDirect3D9_CreateDevice(
+        d3d9,
+        D3DADAPTER_DEFAULT,
+        D3DDEVTYPE_NULLREF,
+        window_context.window,
+        D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_DISABLE_DRIVER_MANAGEMENT,
+        &d3d9_params,
+        &d3device
+    );
+    if (res != D3D_OK || d3device == NULL) {
+        goto CLEANUP_D3D;
+    }
+    memcpy(pTable, *reinterpret_cast<void***>(d3device), sizeof(pTable));
+    ret = true;
+
+    // cleanup in reverse order
+CLEANUP_DEVICE:
+    IDirect3DDevice9_Release(d3device);
+CLEANUP_D3D:
+    IDirect3D9_Release(d3device);
+CLEANUP_WINDOW:
+    DestroyWindow(window_context.window);
+CLEANUP_CONTEXT:
+    UnregisterClass(window_context.wclass.lpszClassName, window_context.wclass.hInstance);
+    return ret;
+}
+
 void initPaletteLoadPatches();
 
 //#define ENABLEFILELOG 1
@@ -2313,13 +2413,9 @@ void __stdcall legacyPauseCallback(DWORD dwMilliseconds)
 	// please never move this
 	static bool isDirectXHooked = false;
 	if (!isDirectXHooked) {
-        if (isWine == ERROR_SUCCESS) {
-            isDirectXHooked = true;
-            memcpy(pTable, *reinterpret_cast<void***>(device), sizeof(pTable));
-            oPresent = (tPresent)trampolineHook((char*)pTable[17], (char*)hkPresent, 7);
-	    } else {
-			isDirectXHooked = HookDirectX();
-		}
+        isDirectXHooked = true;
+        d3device_vtable();
+        oPresent = (tPresent)trampolineHook((char*)pTable[17], (char*)hkPresent, 7);
 	}
 
 	static bool isRendererHooked = false;
@@ -2770,13 +2866,15 @@ void frameDoneCallback()
 		}
 	}
 
+    // get the d3ddevice
 	// this hooks directx
 	static bool deviceInit = false;
 	if (!deviceInit && *(DWORD*)0x0076e7d4 != 0) {
 		deviceInit = true;
 
-		dwDevice = *(DWORD*)0x0076e7d4;
+        d3device_vtable();
 
+		dwDevice = *(DWORD*)0x0076e7d4;
 		device = (IDirect3DDevice9*)dwDevice;
 
 		unsigned avalTexMem = device->GetAvailableTextureMem();
