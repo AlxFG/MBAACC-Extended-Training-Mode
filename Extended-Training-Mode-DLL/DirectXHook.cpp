@@ -5,7 +5,7 @@
 #include "DirectX.h"
 #include <stdint.h>
 
-unitptr_t *pTable;
+uintptr_t *pTable;
 tPresent oPresent = nullptr;
 
 bool bInit = false;

@@ -6,7 +6,7 @@
 
 extern bool bInit;
 
-extern void* pTable[119];
+extern uintptr_t *pTable;
 extern LPDIRECT3DDEVICE9 device;
 
 char* trampolineHook(char* src, char* dst, int len);
