@@ -257,7 +257,7 @@ Window_Context create_window(void) {
     return context;
 }
 
-bool hooks_create(void) {
+bool d3device_vtable(void) {
     bool ret = false;
     // create dummy window
     Window_Context window_context = create_window();
