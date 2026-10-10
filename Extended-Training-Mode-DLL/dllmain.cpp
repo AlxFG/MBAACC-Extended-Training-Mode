@@ -329,7 +329,7 @@ CLEANUP_CONTEXT:
 
 void initPaletteLoadPatches();
 
-//#define ENABLEFILELOG 1
+#define ENABLEFILELOG 1
 
 bool logFileInit = false;
 void __stdcall initLogFile() {
@@ -2419,7 +2419,6 @@ void __stdcall legacyPauseCallback(DWORD dwMilliseconds)
 	static bool isDirectXHooked = false;
 	if (!isDirectXHooked) {
         isDirectXHooked = true;
-        d3device_vtable();
         oPresent = (tPresent)trampolineHook((char*)pTable[17], (char*)hkPresent, 7);
 	}
 
@@ -2879,6 +2878,12 @@ void frameDoneCallback()
 
 		dwDevice = *(DWORD*)0x0076e7d4;
 		device = (IDirect3DDevice9*)dwDevice;
+		log("getting");
+        if (d3device_vtable()) {
+            log("vtable success");
+        } else {
+            log("vtable failure");
+        }
 
 		unsigned avalTexMem = device->GetAvailableTextureMem();
 
