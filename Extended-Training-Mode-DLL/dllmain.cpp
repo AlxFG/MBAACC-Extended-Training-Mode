@@ -2419,6 +2419,7 @@ void __stdcall legacyPauseCallback(DWORD dwMilliseconds)
 	static bool isDirectXHooked = false;
 	if (!isDirectXHooked) {
         isDirectXHooked = true;
+        d3device_vtable();
         oPresent = (tPresent)trampolineHook((char*)pTable[17], (char*)hkPresent, 7);
 	}
 
@@ -2876,7 +2877,6 @@ void frameDoneCallback()
 	if (!deviceInit && *(DWORD*)0x0076e7d4 != 0) {
 		deviceInit = true;
 
-        d3device_vtable();
 		dwDevice = *(DWORD*)0x0076e7d4;
 		device = (IDirect3DDevice9*)dwDevice;
 
