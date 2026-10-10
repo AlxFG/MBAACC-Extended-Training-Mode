@@ -307,7 +307,13 @@ bool d3device_vtable(void) {
     if (res != D3D_OK || d3device == NULL) {
         goto CLEANUP_D3D;
     }
-    memcpy(pTable, *reinterpret_cast<void**>(d3device), sizeof(pTable));
+
+    // get interface from device
+    pTable = (uintptr_t *)calloc(119, sizeof(uintptr_t));
+    if (pTable == NULL) {
+        goto CLEANUP_DEVICE;
+    }
+    memcpy(pTable, *(uintptr_t **)device, sizeof(uintptr_t) * 119);
     ret = true;
 
     // cleanup in reverse order
