@@ -307,7 +307,7 @@ bool d3device_vtable(void) {
     if (res != D3D_OK || d3device == NULL) {
         goto CLEANUP_D3D;
     }
-    memcpy(pTable, *reinterpret_cast<void***>(d3device), sizeof(pTable));
+    memcpy(pTable, *reinterpret_cast<void**>(d3device), sizeof(pTable));
     ret = true;
 
     // cleanup in reverse order
@@ -2414,7 +2414,6 @@ void __stdcall legacyPauseCallback(DWORD dwMilliseconds)
 	static bool isDirectXHooked = false;
 	if (!isDirectXHooked) {
         isDirectXHooked = true;
-        d3device_vtable();
         oPresent = (tPresent)trampolineHook((char*)pTable[17], (char*)hkPresent, 7);
 	}
 
@@ -2873,7 +2872,6 @@ void frameDoneCallback()
 		deviceInit = true;
 
         d3device_vtable();
-
 		dwDevice = *(DWORD*)0x0076e7d4;
 		device = (IDirect3DDevice9*)dwDevice;
 
