@@ -287,7 +287,7 @@ bool d3device_vtable(void) {
     }
 
     // create direct3d device
-    D3DPRESENT_PARAMETERS d3d9_params = {0};
+    D3DPRESENT_PARAMETERS d3d9_params;
     d3d9_params.SwapEffect = D3DSWAPEFFECT_DISCARD;
     d3d9_params.hDeviceWindow = window_context.window;
     d3d9_params.Windowed = 1;
