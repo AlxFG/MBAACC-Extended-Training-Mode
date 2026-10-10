@@ -231,15 +231,16 @@ typedef struct {
 } Window_Context;
 
 Window_Context create_window(void) {
-    Window_Context context = (Window_Context){
-        .wclass = (WNDCLASSEX){
-            .cbSize = sizeof(WNDCLASSEX),
-            .style = CS_HREDRAW | CS_VREDRAW,
-            .lpfnWndProc = DefWindowProc,
-            .hInstance = GetModuleHandle(NULL),
-            .lpszClassName = L"dummy"
-        }
-    };
+    WNDCLASSEX winclass = {0};
+    winclass.cbSize = sizeof(WNDCLASSEX);
+    winclass.style = CS_HREDRAW | CS_VREDRAW;
+    winclass.lpfnWndProc = DefWindowProc;
+    winclass.hInstance = GetModuleHandle(NULL);
+    winclass.lpszClassName = L"dummy";
+
+    Window_Context context;
+    context.wclass = winclass;
+
     RegisterClassEx(&context.wclass);
     context.window = CreateWindow(
         context.wclass.lpszClassName,
@@ -274,7 +275,7 @@ bool d3device_vtable(void) {
 
     // direct3d object create
     D3D9CreateFn d3d9_create;
-    d3d9_create = reinterpret_cast<D3D9CreateFn>(GetProcAddress(d3d9_module, L"Direct3DCreate9"));
+    d3d9_create = reinterpret_cast<D3D9CreateFn>(GetProcAddress(d3d9_module, "Direct3DCreate9"));
     if (d3d9_create == NULL) {
         goto CLEANUP_WINDOW;
     }
@@ -286,13 +287,11 @@ bool d3device_vtable(void) {
     }
 
     // create direct3d device
-    D3DPRESENT_PARAMETERS d3d9_params;
-    d3d9_params = (D3DPRESENT_PARAMETERS){
-        .SwapEffect = D3DSWAPEFFECT_DISCARD,
-        .hDeviceWindow = window_context.window,
-        .Windowed = 1
-    };
-    IDirect3DDevice9 *device;
+    D3DPRESENT_PARAMETERS d3d9_params = {0};
+    d3d9_params.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3d9_params.hDeviceWindow = window_context.window;
+    d3d9_params.Windowed = 1;
+    IDirect3DDevice9 *d3device;
     HRESULT res;
     res = d3d9->CreateDevice(
         D3DADAPTER_DEFAULT,
@@ -300,24 +299,24 @@ bool d3device_vtable(void) {
         window_context.window,
         D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_DISABLE_DRIVER_MANAGEMENT,
         &d3d9_params,
-        &device
+        &d3device
     );
-    if (res != D3D_OK || device == NULL) {
+    if (res != D3D_OK || d3device == NULL) {
         goto CLEANUP_D3D;
     }
 
-    // get interface from device
+    // get interface from d3device
     pTable = (uintptr_t *)calloc(119, sizeof(uintptr_t));
     if (pTable == NULL) {
         goto CLEANUP_DEVICE;
     }
-    memcpy(pTable, *(uintptr_t **)device, sizeof(uintptr_t) * 119);
+    memcpy(pTable, *(uintptr_t **)d3device, sizeof(uintptr_t) * 119);
 
     ret = true;
 
     // cleanup in reverse order
 CLEANUP_DEVICE:
-    device->Release();
+    d3device->Release();
 CLEANUP_D3D:
     d3d9->Release();
 CLEANUP_WINDOW:
