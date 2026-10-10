@@ -316,13 +316,13 @@ bool d3device_vtable(void) {
 
     // cleanup in reverse order
 CLEANUP_DEVICE:
-    d3device->Release();
+    //d3device->Release();
 CLEANUP_D3D:
-    d3d9->Release();
+    //d3d9->Release();
 CLEANUP_WINDOW:
-    DestroyWindow(window_context.window);
+    //DestroyWindow(window_context.window);
 CLEANUP_CONTEXT:
-    UnregisterClass(window_context.wclass.lpszClassName, window_context.wclass.hInstance);
+    //UnregisterClass(window_context.wclass.lpszClassName, window_context.wclass.hInstance);
     return ret;
 }
 
