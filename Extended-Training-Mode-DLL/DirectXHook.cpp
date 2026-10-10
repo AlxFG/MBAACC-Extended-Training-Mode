@@ -3,8 +3,9 @@
 #endif
 #include "DirectXHook.h"
 #include "DirectX.h"
+#include <stdint.h>
 
-void* pTable[119];
+uintptr_t pTable[119];
 tPresent oPresent = nullptr;
 
 bool bInit = false;
