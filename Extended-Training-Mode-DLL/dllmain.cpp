@@ -2419,7 +2419,6 @@ void __stdcall legacyPauseCallback(DWORD dwMilliseconds)
 	static bool isDirectXHooked = false;
 	if (!isDirectXHooked) {
         isDirectXHooked = true;
-        oPresent = (tPresent)trampolineHook((char*)pTable[17], (char*)hkPresent, 7);
 	}
 
 	static bool isRendererHooked = false;
@@ -2878,12 +2877,6 @@ void frameDoneCallback()
 
 		dwDevice = *(DWORD*)0x0076e7d4;
 		device = (IDirect3DDevice9*)dwDevice;
-		log("getting");
-        if (d3device_vtable()) {
-            log("vtable success");
-        } else {
-            log("vtable failure");
-        }
 
 		unsigned avalTexMem = device->GetAvailableTextureMem();
 
@@ -7947,6 +7940,7 @@ void initCasterMods()
 	// putting shock collar and 2v2 into melty just,, thats for another day
 
 
+    oPresent = (tPresent)trampolineHook((char*)GetProcAddress(casterHook, "PresentFrameBegin", (char*)hkPresent, 7);
 
 }
 
