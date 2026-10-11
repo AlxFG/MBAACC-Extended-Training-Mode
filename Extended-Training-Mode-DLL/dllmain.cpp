@@ -7940,7 +7940,7 @@ void initCasterMods()
 	// putting shock collar and 2v2 into melty just,, thats for another day
 
 
-    oPresent = (tPresent)trampolineHook((char*)GetProcAddress(casterHook, "PresentFrameBegin", (char*)hkPresent, 7);
+    oPresent = (tPresent)trampolineHook((char*)GetProcAddress(casterHook, "PresentFrameBegin"), (char*)hkPresent, 7);
 
 }
 
